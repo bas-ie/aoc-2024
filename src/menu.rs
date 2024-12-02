@@ -1,6 +1,5 @@
 use bevy::{
     color::palettes::css::{FIRE_BRICK, GREEN},
-    ecs::system::RunSystemOnce,
     prelude::*,
 };
 
@@ -13,10 +12,10 @@ pub(super) fn plugin(app: &mut App) {
 #[derive(Component)]
 struct Menu;
 
-fn init(world: &mut World) {
-    world.spawn((Name::new("Camera"), Camera2d));
+fn init(mut commands: Commands) {
+    commands.spawn((Name::new("Camera"), Camera2d));
 
-    world.spawn((
+    commands.spawn((
         Name::new("Menu"),
         Menu,
         Node {
@@ -30,9 +29,7 @@ fn init(world: &mut World) {
         StateScoped(AoCState::Menu),
     ));
 
-    world
-        .run_system_once_with(AoCState::Day1, spawn_puzzle_link)
-        .expect("Spawning puzzle link failed!");
+    commands.run_system_cached_with(spawn_puzzle_link, AoCState::Day1);
 }
 
 fn spawn_puzzle_link(
@@ -57,7 +54,7 @@ fn spawn_puzzle_link(
             },
         ))
         .with_children(|p| {
-            p.spawn((Text::new("One")));
+            p.spawn(Text::new("One"));
         })
         .observe(
             move |_ev: Trigger<Pointer<Click>>, mut next_state: ResMut<NextState<AoCState>>| {
