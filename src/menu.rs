@@ -57,7 +57,7 @@ fn spawn_puzzle_link(
             },
         ))
         .with_children(|p| {
-            p.spawn((Text::new("One")));
+            p.spawn(Text::new("One"));
         })
         .observe(
             move |_ev: Trigger<Pointer<Click>>, mut next_state: ResMut<NextState<AoCState>>| {
