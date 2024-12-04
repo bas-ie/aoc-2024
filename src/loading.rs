@@ -20,4 +20,6 @@ pub(super) fn plugin(app: &mut App) {
 pub(crate) struct PuzzleInputs {
     #[asset(path = "input/1.aoc")]
     pub one: Handle<PuzzleInputAsset>,
+    #[asset(path = "input/2.aoc")]
+    pub two: Handle<PuzzleInputAsset>,
 }

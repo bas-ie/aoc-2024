@@ -66,9 +66,9 @@ fn process(
     if let Some(puzzle) = puzzle_assets.get(&puzzle_inputs.one) {
         let mut left_list: Vec<i32> = vec![];
         let mut right_list: Vec<i32> = vec![];
-        for (left, right) in &puzzle.rows {
-            left_list.push(*left);
-            right_list.push(*right);
+        for row in &puzzle.rows {
+            left_list.push(row[0]);
+            right_list.push(row[1]);
         }
         left_list.sort();
         right_list.sort();

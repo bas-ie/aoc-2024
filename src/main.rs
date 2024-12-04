@@ -11,6 +11,7 @@ pub enum AoCState {
     Loading,
     Menu,
     Day1,
+    Day2,
 }
 
 fn main() {

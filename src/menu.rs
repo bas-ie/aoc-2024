@@ -29,15 +29,17 @@ fn init(mut commands: Commands) {
         StateScoped(AoCState::Menu),
     ));
 
-    commands.run_system_cached_with(spawn_puzzle_link, AoCState::Day1);
+    commands.run_system_cached_with(spawn_puzzle_link, (AoCState::Day1, "One".into()));
+    commands.run_system_cached_with(spawn_puzzle_link, (AoCState::Day2, "Two".into()));
 }
 
 fn spawn_puzzle_link(
-    state: In<AoCState>,
+    state: In<(AoCState, String)>,
     mut commands: Commands,
     menu: Single<Entity, With<Menu>>,
 ) {
     commands.entity(*menu).with_children(|p| {
+        let (day, label) = state.0;
         p.spawn((
             Button,
             BackgroundColor(FIRE_BRICK.into()),
@@ -54,11 +56,11 @@ fn spawn_puzzle_link(
             },
         ))
         .with_children(|p| {
-            p.spawn(Text::new("One"));
+            p.spawn(Text::new(label));
         })
         .observe(
             move |_ev: Trigger<Pointer<Click>>, mut next_state: ResMut<NextState<AoCState>>| {
-                next_state.set(*state);
+                next_state.set(day);
             },
         );
     });
