@@ -5,7 +5,7 @@ use bevy::{
 
 use crate::AoCState;
 
-pub(super) fn plugin(app: &mut App) {
+pub fn plugin(app: &mut App) {
     app.add_systems(OnEnter(AoCState::Menu), init);
 }
 
@@ -31,6 +31,8 @@ fn init(mut commands: Commands) {
 
     commands.run_system_cached_with(spawn_puzzle_link, (AoCState::Day1, "One".into()));
     commands.run_system_cached_with(spawn_puzzle_link, (AoCState::Day2, "Two".into()));
+    commands.run_system_cached_with(spawn_puzzle_link, (AoCState::Day3, "Three".into()));
+    commands.run_system_cached_with(spawn_puzzle_link, (AoCState::Day4, "Four".into()));
 }
 
 fn spawn_puzzle_link(
@@ -56,7 +58,13 @@ fn spawn_puzzle_link(
             },
         ))
         .with_children(|p| {
-            p.spawn(Text::new(label));
+            p.spawn((
+                Text::new(label),
+                TextFont {
+                    font_size: 14.,
+                    ..default()
+                },
+            ));
         })
         .observe(
             move |_ev: Trigger<Pointer<Click>>, mut next_state: ResMut<NextState<AoCState>>| {

@@ -12,9 +12,6 @@ pub(super) fn plugin(app: &mut App) {
     // .add_systems(Update, visualise);
 }
 
-#[derive(Component)]
-struct CurrentRow;
-
 #[derive(Default, Resource)]
 struct OrderedLocationLists {
     pub left: Vec<i32>,

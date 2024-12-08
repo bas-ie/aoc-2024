@@ -52,7 +52,7 @@ impl AssetLoader for PuzzleInputAssetLoader {
 
             let mut row: Vec<i32> = vec![];
             for col in cols {
-                if col == "" {
+                if col.is_empty() {
                     continue;
                 }
                 let n: i32 = col.parse()?;
