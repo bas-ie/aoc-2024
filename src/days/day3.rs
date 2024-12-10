@@ -89,15 +89,7 @@ fn init(mut commands: Commands) {
 //         );
 //     }
 // }
-//
-// &str
-// "and struh"
-// "stir"
-// "string-ref"
-// "and stir"
-// "ref stir"
-// french: "éh struh"
-// STIR
+
 fn process_line(line: &str) -> miette::Result<Vec<(i32, i32)>> {
     let re = Regex::new(r"mul\((\d+),(\d+)\)").unwrap();
     let mut dos: Vec<&str> = vec![];
