@@ -3,13 +3,12 @@ use bevy::{
     prelude::*,
     reflect::TypePath,
 };
-use itertools::Itertools;
 use thiserror::Error;
 
 #[derive(Asset, TypePath, Debug)]
 pub(crate) struct PuzzleInputAsset {
     #[allow(dead_code)]
-    pub rows: Vec<(i32, i32)>,
+    pub rows: Vec<Vec<i32>>,
 }
 
 #[derive(Default)]
@@ -26,10 +25,6 @@ pub(crate) enum PuzzleInputAssetLoaderError {
     /// A [string conversion](std::string::FromUtf8Error) error
     #[error("Could not parse utf8 from bytes: {0}")]
     FromUtf8(#[from] std::string::FromUtf8Error),
-
-    /// A failure to split the line into tuple of correct size
-    #[error("Could not grok line format: possibly malformed, lacking tuple?")]
-    InvalidLineFormat,
 
     /// An [integer conversion](std::num::ParseIntError)
     #[error("Could not convert to integer: {0}")]
@@ -51,16 +46,20 @@ impl AssetLoader for PuzzleInputAssetLoader {
         let file_contents = String::from_utf8(bytes)?;
         let lines = file_contents.lines();
 
-        let mut rows: Vec<(i32, i32)> = vec![];
+        let mut rows: Vec<Vec<i32>> = vec![];
         for line in lines {
-            let Some((left, right)) = line.split("   ").collect_tuple() else {
-                return Err(PuzzleInputAssetLoaderError::InvalidLineFormat);
-            };
+            let cols: Vec<&str> = line.split(" ").collect();
 
-            let lhs: i32 = left.parse()?;
-            let rhs: i32 = right.parse()?;
+            let mut row: Vec<i32> = vec![];
+            for col in cols {
+                if col.is_empty() {
+                    continue;
+                }
+                let n: i32 = col.parse()?;
+                row.push(n);
+            }
 
-            rows.push((lhs, rhs));
+            rows.push(row);
         }
         Ok(PuzzleInputAsset { rows })
     }
