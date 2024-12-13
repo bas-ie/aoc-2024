@@ -29,7 +29,7 @@ fn init(mut commands: Commands) {
                 width: Val::Percent(100.),
                 ..default()
             },
-            StateScoped(AoCState::Day3),
+            StateScoped(AoCState::Day4),
         ))
         .with_children(|p| {
             p.spawn((
