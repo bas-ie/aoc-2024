@@ -1,5 +1,5 @@
 use crate::{loading::PuzzleInputs, puzzle_input_lines_asset::PuzzleInputLinesAsset, AoCState};
-use bevy::{color::palettes::css::FIRE_BRICK, prelude::*};
+use bevy::prelude::*;
 use miette::miette;
 
 pub(super) fn plugin(app: &mut App) {
@@ -277,14 +277,7 @@ fn vis(
                     StateScoped(AoCState::Day4),
                 ))
                 .with_children(|p| {
-                    let mut color = Color::default();
-                    if col.is_match {
-                        color = Color::Srgba(FIRE_BRICK.into());
-                    }
-                    let mut letter = ".";
-                    if col.is_match {
-                        letter = "🎄";
-                    }
+                    let letter = if col.is_match { "." } else { "🎄" };
                     p.spawn((
                         Text::new(letter),
                         TextFont {

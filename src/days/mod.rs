@@ -5,6 +5,7 @@ mod day2;
 mod day3;
 mod day4;
 mod day5;
+mod day6;
 
 pub(super) fn plugin(app: &mut App) {
     app.add_plugins((
@@ -13,5 +14,6 @@ pub(super) fn plugin(app: &mut App) {
         day3::plugin,
         day4::plugin,
         day5::plugin,
+        day6::plugin,
     ));
 }

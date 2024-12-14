@@ -9,11 +9,7 @@ pub(super) fn plugin(app: &mut App) {
             OnEnter(AoCState::Day1),
             (init, process, solve_a, solve_b).chain(),
         );
-    // .add_systems(Update, visualise);
 }
-
-#[derive(Component)]
-struct CurrentRow;
 
 #[derive(Default, Resource)]
 struct OrderedLocationLists {

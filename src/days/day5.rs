@@ -117,20 +117,23 @@ fn update_is_valid(rules: &[Rule], update: &[i32]) -> bool {
 
 fn fix_update(rules: &[Rule], update: &[i32]) -> miette::Result<Vec<i32>> {
     let mut fixed: Vec<i32> = update.to_vec();
-    for rule in rules {
-        let Some(a) = update.iter().position(|x| *x == rule.before) else {
-            dbg!("no a");
+    let mut idx = 0;
+    while idx < rules.len() {
+        let Some(a) = fixed.iter().position(|x| *x == rules[idx].before) else {
+            idx += 1;
             continue;
         };
-        let Some(b) = update.iter().position(|x| *x == rule.after) else {
-            dbg!("no b");
+        let Some(b) = fixed.iter().position(|x| *x == rules[idx].after) else {
+            idx += 1;
             continue;
         };
         if b < a {
-            info!("rule: {} was before {}, fixing", fixed[b], fixed[a]);
             fixed.insert(a + 1, fixed[b]);
             fixed.remove(b);
+            idx = 0;
+            continue;
         }
+        idx += 1;
     }
     Ok(fixed)
 }
@@ -145,9 +148,30 @@ fn solve_a(queue: Res<PrintQueue>) {
     dbg!(total);
 }
 
-fn solve_b() {}
+fn solve_b(queue: Res<PrintQueue>) {
+    let mut total = 0;
+    let mut fixed_updates: Vec<Vec<i32>> = vec![];
+    for update in &queue.updates {
+        if !update_is_valid(&queue.rules, update) {
+            let fixed = fix_update(&queue.rules, update).unwrap();
+            fixed_updates.push(fixed.clone());
+            total += fixed[(fixed.len() as f32 / 2.).floor() as usize];
+        }
+    }
+    for update in fixed_updates {
+        if !update_is_valid(&queue.rules, &update) {
+            info!("INVALID: {:?}", update);
+        }
+    }
+    dbg!(total);
+}
 
-fn vis(asset_server: Res<AssetServer>, mut commands: Commands, day5: Single<Entity, With<Day5>>) {}
+const fn vis(
+    _asset_server: Res<AssetServer>,
+    _commands: Commands,
+    _day5: Single<Entity, With<Day5>>,
+) {
+}
 
 #[cfg(test)]
 mod tests {
@@ -259,7 +283,7 @@ mod tests {
             }
         }
         let mut actual = 0;
-        for update in fixed {
+        for update in fixed.iter() {
             dbg!(&update);
             actual += update[(update.len() as f32 / 2.).floor() as usize];
         }

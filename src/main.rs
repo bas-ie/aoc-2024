@@ -1,12 +1,13 @@
 // #![warn(clippy::pedantic)]
 #![warn(clippy::nursery)]
-use bevy::{dev_tools::states::log_transitions, log::tracing_subscriber, prelude::*};
+use bevy::{dev_tools::states::log_transitions, prelude::*};
 
 mod days;
 mod loading;
 mod menu;
 mod puzzle_input_asset;
 mod puzzle_input_lines_asset;
+mod puzzle_input_string_asset;
 
 #[derive(States, Debug, Hash, PartialEq, Eq, Copy, Clone, Default)]
 pub enum AoCState {
@@ -18,10 +19,10 @@ pub enum AoCState {
     Day3,
     Day4,
     Day5,
+    Day6,
 }
 
 fn main() {
-    tracing_subscriber::fmt::init();
     App::new()
         .add_plugins((DefaultPlugins, loading::plugin, menu::plugin, days::plugin))
         .init_state::<AoCState>()
