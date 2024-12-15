@@ -20,6 +20,7 @@ pub enum AoCState {
     Day4,
     Day5,
     Day6,
+    Day7,
 }
 
 fn main() {
