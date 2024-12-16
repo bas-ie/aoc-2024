@@ -36,6 +36,7 @@ fn init(mut commands: Commands) {
     commands.run_system_cached_with(spawn_puzzle_link, (AoCState::Day5, "Five".into()));
     commands.run_system_cached_with(spawn_puzzle_link, (AoCState::Day6, "Six".into()));
     commands.run_system_cached_with(spawn_puzzle_link, (AoCState::Day7, "Seven".into()));
+    commands.run_system_cached_with(spawn_puzzle_link, (AoCState::Day8, "Eight".into()));
 }
 
 fn spawn_puzzle_link(

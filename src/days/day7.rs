@@ -125,9 +125,6 @@ fn all_operators(length: usize) -> Vec<Vec<Operation>> {
 }
 
 fn eval_if_valid(eq: &[Equation]) -> miette::Result<i64> {
-    // let Equation::TestValue(tv) = &eq[0] else {
-    //     return Ok(0);
-    // };
     if let Equation::TestValue(tv) = &eq[0] {
         let remaining_values: Vec<Equation> = eq[1..].into();
         let ops = all_operators(remaining_values.len() - 1);
