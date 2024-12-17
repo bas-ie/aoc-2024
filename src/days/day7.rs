@@ -1,5 +1,7 @@
 #![allow(dead_code, unused)]
 
+use std::ops::{Add, AddAssign, Mul, MulAssign};
+
 use crate::{loading::PuzzleInputs, puzzle_input_string_asset::PuzzleInputStringAsset, AoCState};
 use bevy::prelude::*;
 use chumsky::prelude::*;
@@ -51,6 +53,46 @@ enum Equation {
     TestValue(i64),
 }
 
+impl Add for Equation {
+    type Output = Equation;
+
+    fn add(self, other: Equation) -> Equation {
+        match (self, other) {
+            (Equation::Number(lhs), Equation::Number(rhs)) => Equation::Number(lhs + rhs),
+            _ => panic!("can't handle mismatched Equation variants"),
+        }
+    }
+}
+
+impl AddAssign for Equation {
+    fn add_assign(&mut self, other: Equation) {
+        *self = match (&*self, other) {
+            (Equation::Number(lhs), Equation::Number(rhs)) => Equation::Number(lhs + rhs),
+            _ => panic!("can't handle mismatched Equation variants"),
+        };
+    }
+}
+
+impl Mul for Equation {
+    type Output = Equation;
+
+    fn mul(self, other: Equation) -> Equation {
+        match (self, other) {
+            (Equation::Number(lhs), Equation::Number(rhs)) => Equation::Number(lhs * rhs),
+            _ => panic!("can't handle mismatched Equation variants"),
+        }
+    }
+}
+
+impl MulAssign for Equation {
+    fn mul_assign(&mut self, other: Equation) {
+        *self = match (&*self, other) {
+            (Equation::Number(lhs), Equation::Number(rhs)) => Equation::Number(lhs * rhs),
+            _ => panic!("can't handle mismatched Equation variants"),
+        };
+    }
+}
+
 #[derive(Default, Resource)]
 struct Equations {
     candidates: Vec<Vec<Equation>>,
@@ -97,10 +139,10 @@ fn process(
 enum Operation {
     Add,
     Multiply,
+    Concatenate,
 }
 
 // NOTE: `multi_cartesian_product` e.g. Chris' solution:
-// a la
 // let ops = operator_count.map(|_| ['*', '+']).multi_cartesian_product();
 fn all_operators(length: usize) -> Vec<Vec<Operation>> {
     let total_combinations = 2_u32.pow(length as u32);
@@ -139,6 +181,7 @@ fn eval_if_valid(eq: &[Equation]) -> miette::Result<i64> {
                     match candidate[i - 1] {
                         Operation::Add => total += lhs,
                         Operation::Multiply => total *= lhs,
+                        _ => (),
                     }
                 }
             }
@@ -152,6 +195,43 @@ fn eval_if_valid(eq: &[Equation]) -> miette::Result<i64> {
     Ok(0)
 }
 
+fn eval_if_valid_concat(eq: &[Equation]) -> miette::Result<i64> {
+    let Equation::TestValue(tv) = &eq[0] else {
+        return Err(miette!("TestValue parse fail"));
+    };
+    let mut values: Vec<Equation> = eq[1..].into();
+    let is_valid = (0..values.len() - 1)
+        .map(|_| [Operation::Add, Operation::Multiply, Operation::Concatenate])
+        .multi_cartesian_product()
+        .any(|op_sequence| {
+            let mut op = op_sequence.iter();
+            let mut val = values.iter().copied();
+
+            let Some(Equation::Number(result)) = val.reduce(|acc, v| match op.next().unwrap() {
+                Operation::Add => acc + v,
+                Operation::Multiply => acc * v,
+                Operation::Concatenate => {
+                    let Equation::Number(lhs) = acc else {
+                        panic!("concatenate failed");
+                    };
+                    let Equation::Number(rhs) = v else {
+                        panic!("concatenate failed");
+                    };
+                    Equation::Number((lhs.to_string() + &rhs.to_string()).parse::<i64>().unwrap())
+                }
+            }) else {
+                return false;
+            };
+            *tv == result
+        });
+
+    if is_valid {
+        Ok(*tv)
+    } else {
+        Ok(0)
+    }
+}
+
 fn solve_a(equations: Res<Equations>) {
     let mut actual = 0;
     for equation in &equations.candidates {
@@ -160,7 +240,13 @@ fn solve_a(equations: Res<Equations>) {
     dbg!(actual);
 }
 
-const fn solve_b() {}
+fn solve_b(equations: Res<Equations>) {
+    let mut actual = 0;
+    for equation in &equations.candidates {
+        actual += eval_if_valid_concat(equation).unwrap();
+    }
+    dbg!(actual);
+}
 
 const fn vis(
     _asset_server: Res<AssetServer>,
@@ -209,7 +295,15 @@ mod tests {
 192: 17 8 14
 21037: 9 7 18 13
 292: 11 6 16 20";
-        let equations = parser().parse(input);
+        let equations = parser()
+            .parse(input)
+            .map_err(|_| miette!("puzzle input parse failed"))?;
+        let mut actual = 0;
+        for equation in equations {
+            actual += eval_if_valid_concat(&equation)?;
+        }
+        let expected = 11387;
+        assert_eq!(expected, actual);
         Ok(())
     }
 }
