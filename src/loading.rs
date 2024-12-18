@@ -40,4 +40,6 @@ pub struct PuzzleInputs {
     pub seven: Handle<PuzzleInputStringAsset>,
     #[asset(path = "input/8.aoc")]
     pub eight: Handle<PuzzleInputStringAsset>,
+    #[asset(path = "input/9.aoc")]
+    pub nine: Handle<PuzzleInputStringAsset>,
 }
